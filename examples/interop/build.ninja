@@ -1,0 +1,25 @@
+cc     = clang
+ccflags = -Wall -fPIC
+cclinkerflags = -lstdc++
+
+rule compile
+  command = $cc $ccflags -c $in -o $out
+
+rule link
+  command = $cc $cclinkerflags $in -o $out -v
+
+rule static_library
+  command = ar rcs $out $in
+
+build obj/fun_a.o: compile fun_a.cxx
+build lib/fun_a.a: static_library obj/fun_a.o
+
+build obj/fun_c.o: compile fun_c.cxx
+build lib/fun_c.a: static_library obj/fun_c.o
+
+build obj/call_fun_c.o: compile call_fun_c.cxx
+build lib/call_fun_c.a: static_library obj/call_fun_c.o
+
+build out/hello: link lib/call_fun_c.a lib/fun_c.a libfun_b.a lib/fun_a.a
+
+default out/hello

@@ -32,12 +32,19 @@ def _impl_ninja_target(ctx):
     inputs = ctx.attr.ninja_configuration.files.to_list()
     for l in ctx.attr.srcs:
         inputs += l.files.to_list()
+    symlink_flat = []
+    for l in ctx.attr.symlink_flat:
+        inputs += l.files.to_list()
+        symlink_flat += l.files.to_list()
     declared_outputs = []
-    script = "ninja -C %s -f %s %s" % (ninja_configuration.working_directory, ninja_configuration.build_ninja.path, ctx.attr.target)
+    script = "echo '' "
+    for symlink_flat_file in symlink_flat:
+        script += " && ln -s %s %s " % (symlink_flat_file.path, symlink_flat_file.basename)
+    script += " && ninja -C %s -f %s %s" % (ninja_configuration.working_directory, ninja_configuration.build_ninja.path, ctx.attr.target)
     for output in ctx.attr.outputs:
         declared = ctx.actions.declare_file(output)
         declared_outputs.append(declared)
-        script += "&& cp %s %s" % (output, declared.path)
+        script += " && cp %s %s " % (output, declared.path)
 
     ctx.actions.run_shell(
         mnemonic = "NinjaTarget",
@@ -64,6 +71,7 @@ ninja_target = rule(
         "ninja_configuration": attr.label(),
         "target": attr.string(),
         "srcs": attr.label_list(allow_files = True),
+        "symlink_flat": attr.label_list(allow_files = True, mandatory = False),
         "outputs": attr.string_list(),
     },
 )

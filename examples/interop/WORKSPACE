@@ -1,0 +1,6 @@
+workspace(name = "example_bazel_ninja_interop")
+
+local_repository(
+    name = "ninja_bazel_interop",
+    path = "../.."
+)
