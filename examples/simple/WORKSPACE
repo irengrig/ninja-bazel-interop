@@ -1,0 +1,6 @@
+workspace(name = "simple_example_of_invoking_ninja")
+
+local_repository(
+    name = "ninja_bazel_interop",
+    path = "../.."
+)

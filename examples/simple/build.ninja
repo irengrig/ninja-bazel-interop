@@ -1,0 +1,14 @@
+cc     = clang
+ccflags = -Wall
+cclinkerflags = -lstdc++
+
+rule compile
+  command = $cc $ccflags -c $in -o $out
+
+rule link
+  command = $cc $cclinkerflags $in -o $out -v
+
+build out/hello.o: compile hello.cxx
+build out/hello: link out/hello.o
+
+default out/hello
